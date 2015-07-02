@@ -170,7 +170,7 @@ public class SmsComposeActivity extends AppCompatActivity {
 	}
 
 	/* Send message using SmsManager */
-	private void sendSMS(String phoneNumber, String message) {
+	private void sendSMS(final String phoneNumber, final String message) {
 
 		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(
 				SENT), 0);
@@ -182,6 +182,7 @@ public class SmsComposeActivity extends AppCompatActivity {
 				case Activity.RESULT_OK:
 					Toast.makeText(getBaseContext(), "Sent", Toast.LENGTH_SHORT)
 							.show();
+					Utility.saveSentSms(SmsComposeActivity.this, phoneNumber, message);
 					finish();
 					break;
 				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
@@ -210,18 +211,5 @@ public class SmsComposeActivity extends AppCompatActivity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, null);
-		if (Utility.isDeafultSmsApp(this)) {
-			saveMessage(this, phoneNumber, message);
-		}
-	}
-
-	/* Save sent message */
-	public static void saveMessage(Context context, String phoneNumber,
-			String message) {
-		ContentValues values = new ContentValues();
-		values.put(Telephony.Sms.Sent.ADDRESS, phoneNumber);
-		values.put(Telephony.Sms.Sent.BODY, message);
-		context.getContentResolver().insert(Telephony.Sms.Sent.CONTENT_URI,
-				values);
 	}
 }
