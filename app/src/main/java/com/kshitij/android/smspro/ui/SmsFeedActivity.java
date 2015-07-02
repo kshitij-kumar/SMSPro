@@ -25,7 +25,7 @@ import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.kshitij.android.smspro.R;
 import com.kshitij.android.smspro.adapter.SmsFeedAdapter;
 import com.kshitij.android.smspro.util.ContentManager;
-import com.kshitij.android.smspro.util.Utility;
+import com.kshitij.android.smspro.util.SmsUtils;
 import com.melnykov.fab.FloatingActionButton;
 
 /**
@@ -75,11 +75,11 @@ public class SmsFeedActivity extends AppCompatActivity implements
 									.getColumnIndexOrThrow(Telephony.Sms.ADDRESS));
 							String message = cursor.getString(cursor
 									.getColumnIndexOrThrow(Telephony.Sms.BODY));
-							if (Utility.isKnownNumber(phoneNumber)) {
-								Utility.markSmsAsRead(mContext, phoneNumber,
+							if (SmsUtils.isKnownNumber(phoneNumber)) {
+								SmsUtils.markSmsAsRead(mContext, phoneNumber,
 										message);
 							} else {
-								Utility.deleteSms(mContext, phoneNumber,
+								SmsUtils.deleteSms(mContext, phoneNumber,
 										message);
 							}
 							mSmsFeedAdapter.notifyDataSetChanged();
@@ -189,8 +189,8 @@ public class SmsFeedActivity extends AppCompatActivity implements
 				String phoneNumber = cursor.getString(cursor
 						.getColumnIndexOrThrow(Telephony.Sms.ADDRESS));
 				if (contactsMap.get(phoneNumber) == null) {
-					String name = Utility.getContactName(mContext, phoneNumber);
-					if (Utility.isNullOrEmpty(name)) {
+					String name = SmsUtils.getContactName(mContext, phoneNumber);
+					if (SmsUtils.isNullOrEmpty(name)) {
 						contactsMap.put(phoneNumber, "Unknown");
 					} else {
 						contactsMap.put(phoneNumber, name);

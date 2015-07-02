@@ -12,13 +12,13 @@ import android.provider.Telephony;
  * Created by kshitij.kumar on 30-06-2015.
  */
 
-public class Utility {
+public class SmsUtils {
 
 	public static boolean isNullOrEmpty(String reference) {
 		return reference == null || reference.length() == 0;
 	}
 
-	public static boolean isDeafultSmsApp(Context context) {
+	public static boolean isDefaultSmsApp(Context context) {
 
 		return Telephony.Sms.getDefaultSmsPackage(context).equals(
 				context.getPackageName());
@@ -73,7 +73,7 @@ public class Utility {
 
 	public static void markSmsAsRead(final Context context, final String from,
 									 final String body) {
-		if (!isDeafultSmsApp(context))
+		if (!isDefaultSmsApp(context))
 			return;
 
 		new Thread() {
@@ -96,7 +96,7 @@ public class Utility {
 
 	public static void deleteSms(final Context context,
 								 final String phoneNumber, final String message) {
-		if (!isDeafultSmsApp(context))
+		if (!isDefaultSmsApp(context))
 			return;
 
 		new Thread() {
@@ -114,7 +114,7 @@ public class Utility {
 	/* Save sent message */
 	public static void saveSentSms(final Context context,
 								   final String phoneNumber, final String message) {
-		if (!isDeafultSmsApp(context))
+		if (!isDefaultSmsApp(context))
 			return;
 
 		new Thread() {
@@ -132,7 +132,7 @@ public class Utility {
 	/* Saves a received message in inbox, marked as unread */
 	public static void saveReceivedSms(final Context context,
 									   final String phoneNumber, final String message) {
-		if (!isDeafultSmsApp(context))
+		if (!isDefaultSmsApp(context))
 			return;
 
 		new Thread() {

@@ -8,26 +8,25 @@ import java.util.Map;
 
 /**
  * A helper class to maintain map of contact number to their names
- * 
  */
 public class ContentManager {
-	public static final String TAG = ContentManager.class.getSimpleName();
-	static ContentManager mContentManager;
-	Map<String, String> mContactsMap;
+    public static final String TAG = ContentManager.class.getSimpleName();
+    static ContentManager mContentManager;
+    Map<String, String> mContactsMap;
 
-	public synchronized static ContentManager getInstance() {
-		if (mContentManager == null) {
-			mContentManager = new ContentManager();
-		}
-		return mContentManager;
-	}
+    public synchronized static ContentManager getInstance() {
+        if (mContentManager == null) {
+            mContentManager = new ContentManager();
+        }
+        return mContentManager;
+    }
 
-	public Map<String, String> getContactsMap() {
-		return mContactsMap;
-	}
+    public Map<String, String> getContactsMap() {
+        return mContactsMap;
+    }
 
-	public void setContactsMap(Map<String, String> contactsMap) {
-		this.mContactsMap = contactsMap;
-	}
+    public void setContactsMap(Map<String, String> contactsMap) {
+        this.mContactsMap = contactsMap;
+    }
 
 }

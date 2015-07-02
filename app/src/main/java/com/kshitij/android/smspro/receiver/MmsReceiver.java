@@ -15,9 +15,9 @@ import android.util.Log;
 
 public class MmsReceiver extends BroadcastReceiver {
 
-	private static final String TAG = MmsReceiver.class.getSimpleName();
+    private static final String TAG = MmsReceiver.class.getSimpleName();
 
-	public void onReceive(Context context, Intent intent) {
-		Log.d(TAG, "onReceive(), MMS Message Received");
-	}
+    public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive(), MMS Message Received");
+    }
 }
