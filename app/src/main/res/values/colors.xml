@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="shade_of_gray">#c8c8c8</color>
     <color name="caption_gray">#818386</color>
@@ -10,5 +10,8 @@
     <color name="accent">#E91E63</color>
     <color name="accent_pressed">#C2185B</color>
     <color name="light_blue">#E5E5FF</color>
+    <color name="bg_sms_received">#7EB6FF</color>
+    <color name="bg_sms_sent">#5eb964</color>
+    <color name="title_gray">#434343</color>
 
 </resources>

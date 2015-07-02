@@ -78,10 +78,24 @@ public class TimeFormatter {
             return false;
     }
 
+    public static boolean isSameYear(long when) {
+        Calendar now = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(when);
+        return now.get(Calendar.YEAR) == cal.get(Calendar.YEAR);
+    }
+
     public static String getDateFormatMddYYYYhhmma(long longDate) {
-        SimpleDateFormat dateformat = new SimpleDateFormat(
-                "MMM dd, yyyy hh:mm a", Locale.ENGLISH);
-        return dateformat.format(new Date(longDate));
+
+        SimpleDateFormat dateFormat = null;
+        if (DateUtils.isToday(longDate)) {
+            dateFormat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
+        } else if (isSameYear(longDate)) {
+            dateFormat = new SimpleDateFormat("MMM dd, hh:mm a", Locale.ENGLISH);
+        } else {
+            dateFormat = new SimpleDateFormat("MMM dd yyyy, hh:mm a", Locale.ENGLISH);
+        }
+        return dateFormat.format(new Date(longDate));
     }
 
 }

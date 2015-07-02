@@ -41,6 +41,7 @@ public class SmsComposeActivity extends AppCompatActivity {
     private ImageView mImgPickContact;
     private EditText mEdtTxtMessage;
     private ImageView mImgSend;
+    private BroadcastReceiver mSentReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,6 +135,14 @@ public class SmsComposeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        if (mSentReceiver != null) {
+            unregisterReceiver(mSentReceiver);
+        }
+        super.onDestroy();
+    }
+
     /* Launches contact picker */
     private void pickContact() {
         Intent pickContactIntent = new Intent(Intent.ACTION_PICK,
@@ -173,7 +182,7 @@ public class SmsComposeActivity extends AppCompatActivity {
         PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(
                 SENT), 0);
 
-        registerReceiver(new BroadcastReceiver() {
+        mSentReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
@@ -205,7 +214,9 @@ public class SmsComposeActivity extends AppCompatActivity {
                         break;
                 }
             }
-        }, new IntentFilter(SENT));
+        };
+
+        registerReceiver(mSentReceiver, new IntentFilter(SENT));
 
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, message, sentPI, null);

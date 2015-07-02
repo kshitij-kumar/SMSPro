@@ -7,11 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.kshitij.android.smspro.R;
+import com.kshitij.android.smspro.ui.SmsFeedActivity;
 import com.kshitij.android.smspro.ui.SmsViewActivity;
 import com.kshitij.android.smspro.util.SmsUtils;
 
@@ -26,6 +26,7 @@ import com.kshitij.android.smspro.util.SmsUtils;
 public class SmsReceiver extends BroadcastReceiver {
 
     public static final String EXTRA_NOTIFICATION_ID = "extra_notification_id";
+    public static final int REQUEST_CODE_NOTIFICATION_LAUNCH = 555;
     private static final String TAG = SmsReceiver.class.getSimpleName();
     private static final String SMS_BUNDLE = "pdus";
 
@@ -53,24 +54,28 @@ public class SmsReceiver extends BroadcastReceiver {
     private void displayNotification(Context context, String phoneNumber,
                                      String message) {
         int notificationId = 007;
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+        String title = SmsUtils.getContactName(context, phoneNumber);
+        if (SmsUtils.isNullOrEmpty(title)) {
+            title = phoneNumber;
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 context).setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle(phoneNumber).setContentText(message);
+                .setContentTitle(title).setContentText(message);
 
         Intent viewIntent = new Intent(context, SmsViewActivity.class);
         viewIntent.putExtra(SmsViewActivity.EXTRA_PHONE_NUMBER, phoneNumber);
         viewIntent.putExtra(SmsViewActivity.EXTRA_MESSAGE, message);
         viewIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(SmsViewActivity.class);
+        Intent backIntent = new Intent(context, SmsFeedActivity.class);
+        backIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-        stackBuilder.addNextIntent(viewIntent);
-        PendingIntent viewPendingIntent = stackBuilder.getPendingIntent(0,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(viewPendingIntent);
+        PendingIntent viewPendingIntent = PendingIntent.getActivities(context, REQUEST_CODE_NOTIFICATION_LAUNCH,
+                new Intent[]{backIntent, viewIntent}, PendingIntent.FLAG_ONE_SHOT);
+
+        builder.setContentIntent(viewPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(notificationId, mBuilder.build());
+        mNotificationManager.notify(notificationId, builder.build());
     }
 }

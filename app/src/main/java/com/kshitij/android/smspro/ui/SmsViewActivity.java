@@ -1,14 +1,22 @@
 package com.kshitij.android.smspro.ui;
 
 import android.app.NotificationManager;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.Telephony;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.kshitij.android.smspro.R;
+import com.kshitij.android.smspro.adapter.ConversationAdapter;
 import com.kshitij.android.smspro.receiver.SmsReceiver;
+import com.kshitij.android.smspro.util.ContentManager;
 import com.kshitij.android.smspro.util.SmsUtils;
 
 /**
@@ -19,10 +27,15 @@ import com.kshitij.android.smspro.util.SmsUtils;
  * Displays a SMS, either when an item in list is clicked or a notification is
  * clicked
  */
-public class SmsViewActivity extends AppCompatActivity {
+public class SmsViewActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<Cursor> {
     public static final String EXTRA_PHONE_NUMBER = "phone_number";
     public static final String EXTRA_MESSAGE = "message";
     private static final String TAG = SmsViewActivity.class.getSimpleName();
+    private Context mContext;
+    private ListView mConversationListView;
+    private ConversationAdapter mConversationAdapter;
+    private String mPhoneNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +49,20 @@ public class SmsViewActivity extends AppCompatActivity {
             int notificationId = getIntent().getExtras().getInt(
                     SmsReceiver.EXTRA_NOTIFICATION_ID, -1);
             if (notificationId != -1) {
-                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                NotificationManager manager = (NotificationManager) getSystemService(
+                        NOTIFICATION_SERVICE);
                 manager.cancel(notificationId);
             }
-            String phoneNumber = getIntent().getExtras().getString(
-                    EXTRA_PHONE_NUMBER);
-            getSupportActionBar().setTitle(phoneNumber);
+            mPhoneNumber = getIntent().getExtras().getString(EXTRA_PHONE_NUMBER);
+
+            setUpActionBar();
             String message = getIntent().getExtras().getString(EXTRA_MESSAGE);
-            TextView tvMessage = (TextView) findViewById(R.id.tvMessage);
-            tvMessage.setText(message);
-            SmsUtils.markSmsAsRead(this, phoneNumber, message);
+            SmsUtils.markSmsAsRead(this, mPhoneNumber, message);
+
+            mConversationListView = (ListView) findViewById(R.id.conversationList);
+            mConversationAdapter = new ConversationAdapter(this, null, false);
+            mConversationListView.setAdapter(mConversationAdapter);
+            getSupportLoaderManager().restartLoader(0, null, this);
         } else {
             finish();
         }
@@ -60,5 +77,47 @@ public class SmsViewActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+        Log.d(TAG, "onCreateLoader()");
+        String selection = Telephony.Sms.ADDRESS + " = ?";
+        String[] selectionArgs = {mPhoneNumber};
+        CursorLoader loader = new CursorLoader(this, Telephony.Sms.CONTENT_URI, new String[]{},
+                selection, selectionArgs, Telephony.Sms.DATE + " ASC");
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+        mConversationAdapter.swapCursor(cursor);
+        mConversationListView.setSelection(mConversationAdapter.getCount() - 1);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> arg0) {
+        mConversationAdapter.swapCursor(null);
+    }
+
+    private void setUpActionBar() {
+        new Thread() {
+            @Override
+            public void run() {
+                String title = SmsUtils.getContactName(SmsViewActivity.this, mPhoneNumber);
+                if (!SmsUtils.isNullOrEmpty(title)) {
+                    getSupportActionBar().setTitle(title);
+                    getSupportActionBar().setSubtitle(mPhoneNumber);
+                }
+            }
+        }.start();
+
+        if (SmsUtils.isKnownNumber(mPhoneNumber)) {
+            getSupportActionBar().setTitle(ContentManager.getInstance().getContactsMap()
+                    .get(mPhoneNumber));
+            getSupportActionBar().setSubtitle(mPhoneNumber);
+        } else {
+            getSupportActionBar().setTitle(mPhoneNumber);
+        }
     }
 }
