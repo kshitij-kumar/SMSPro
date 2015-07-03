@@ -89,6 +89,7 @@ public class SmsComposeActivity extends AppCompatActivity {
                 String phoneNo = mEdtTxtRecipient.getText().toString();
                 String message = mEdtTxtMessage.getText().toString();
                 if (phoneNo.length() > 0) {
+                    mEdtTxtMessage.clearFocus();
                     mImgSend.setEnabled(false);
                     hideKeyboard();
                     sendSMS(phoneNo, message);
@@ -185,6 +186,7 @@ public class SmsComposeActivity extends AppCompatActivity {
         mSentReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
+                mImgSend.setEnabled(true);
                 switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         Toast.makeText(getBaseContext(), "Sent", Toast.LENGTH_SHORT)

@@ -57,7 +57,7 @@ public class SmsUtils {
         String contactName = null;
         if (cursor.moveToFirst()) {
             contactName = cursor.getString(cursor
-                    .getColumnIndex(PhoneLookup.DISPLAY_NAME));
+                    .getColumnIndexOrThrow(PhoneLookup.DISPLAY_NAME));
         }
         if (cursor != null && !cursor.isClosed()) {
             cursor.close();

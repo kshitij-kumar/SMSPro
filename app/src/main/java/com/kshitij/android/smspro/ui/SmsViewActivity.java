@@ -101,6 +101,14 @@ public class SmsViewActivity extends AppCompatActivity implements
     }
 
     private void setUpActionBar() {
+        if (SmsUtils.isKnownNumber(mPhoneNumber)) {
+            getSupportActionBar().setTitle(ContentManager.getInstance().getContactsMap()
+                    .get(mPhoneNumber));
+            getSupportActionBar().setSubtitle(mPhoneNumber);
+        } else {
+            getSupportActionBar().setTitle(mPhoneNumber);
+        }
+
         new Thread() {
             @Override
             public void run() {
@@ -111,13 +119,5 @@ public class SmsViewActivity extends AppCompatActivity implements
                 }
             }
         }.start();
-
-        if (SmsUtils.isKnownNumber(mPhoneNumber)) {
-            getSupportActionBar().setTitle(ContentManager.getInstance().getContactsMap()
-                    .get(mPhoneNumber));
-            getSupportActionBar().setSubtitle(mPhoneNumber);
-        } else {
-            getSupportActionBar().setTitle(mPhoneNumber);
-        }
     }
 }
